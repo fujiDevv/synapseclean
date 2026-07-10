@@ -1,0 +1,61 @@
+/**
+ * Light paper theme aligned with CxtWeave (shared-theme.css).
+ * Warm paper, ink, cobalt accent, Outfit.
+ */
+:root {
+  color-scheme: light;
+  --paper: #F5F4ED;
+  --bg: #F5F4ED;
+  --ink: #504E49;
+  --ink-soft: #6b6862;
+  --text: #504E49;
+  --muted: #8c8981;
+  --cobalt: #1C375D;
+  --cobalt-dark: #12243e;
+  --cobalt-glow: rgba(28, 55, 93, 0.2);
+  --accent: #1C375D;
+  --brand: #1C375D;
+  --line: #e8e6df;
+  --line-darker: #dcdbd3;
+  --border: #e8e6df;
+  --border-subtle: #eeede7;
+  --white: #ffffff;
+  --panel: #ffffff;
+  --panel-raised: #ffffff;
+  --sidebar: #1c375d;
+  --surface-inset: #f8f7f2;
+  --danger: #b91c1c;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --shadow-panel: 0 40px 80px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  --shadow-card: 0 4px 20px -4px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  --shadow-btn: 0 8px 24px -4px var(--cobalt-glow);
+  --font: "Outfit", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+body.brand-surface {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+body.brand-surface.popup-body {
+  width: 360px;
+}
+
+.hidden {
+  display: none !important;
+}

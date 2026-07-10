@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["chrome", "node"],
+    "typeRoots": ["./node_modules/@types"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true
+  },
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "background.ts",
+    "content.ts",
+    "main_world.ts",
+    "popup/**/*",
+    "options/**/*",
+    "tests/**/*",
+    "e2e/**/*",
+    "playwright.config.ts"
+  ]
+}

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SynapseClean Prompt Console</title>
+  <link rel="stylesheet" href="options.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="brand-surface">
+  <div class="console">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="../assets/logo128.png" alt="SynapseClean" class="brand-icon">
+        <div>
+          <h1>SynapseClean</h1>
+          <p>Prompt Console</p>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-tab="policy">Compaction Policy</button>
+        <button class="nav-btn" data-tab="refinement">Refinement</button>
+        <button class="nav-btn" data-tab="guide">How to Use</button>
+        <button class="nav-btn" data-tab="audit">Usage Log</button>
+        <button class="nav-btn" data-tab="support">Support</button>
+      </nav>
+      <div class="sidebar-footer">
+        <a id="github-link" href="https://github.com/fujiDevv/synapseclean" target="_blank" rel="noopener noreferrer" class="github-link">Open source on GitHub</a>
+        <span id="version-tag">v1.0.0</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section id="tab-policy" class="tab active">
+        <header>
+          <h2>Compaction Policy</h2>
+          <p>Configure on-device compaction before messy web copy hits your clipboard or AI chat.</p>
+        </header>
+
+        <div class="card-grid">
+          <article class="card">
+            <h3>Master Switch</h3>
+            <label class="field checkbox-field">
+              <input id="enabled" type="checkbox">
+              <span>Enable SynapseClean</span>
+            </label>
+          </article>
+
+          <article class="card">
+            <h3>Triggers</h3>
+            <label class="field checkbox-field">
+              <input id="auto-compact" type="checkbox">
+              <span>Auto-compact on copy (selection ≥ min chars)</span>
+            </label>
+            <label class="field checkbox-field">
+              <input id="show-toast" type="checkbox">
+              <span>Show compaction toast after processing</span>
+            </label>
+            <p class="hint">Also use context menu or <kbd data-compact-shortcut>Alt+Shift+C</kbd> on any selection.</p>
+          </article>
+
+          <article class="card">
+            <h3>Threshold</h3>
+            <label class="field">
+              <span>Minimum characters to compact</span>
+              <input id="min-chars" type="number" min="50" max="5000" step="50">
+            </label>
+          </article>
+
+          <article class="card">
+            <h3>Output Format</h3>
+            <label class="field">
+              <span>Compacted output style</span>
+              <select id="output-format">
+                <option value="markdown">Markdown (headings + bullets)</option>
+                <option value="outline">Outline (hierarchical)</option>
+                <option value="bullets">Bullets only</option>
+              </select>
+            </label>
+          </article>
+
+          <article class="card" id="card-advanced-stack">
+            <h3>Semantic engine</h3>
+            <div id="gemini-status-block" class="gemini-status-block">
+              <div class="gemini-status-row">
+                <span>Gemini Nano on this device</span>
+                <span id="gemini-availability" class="status-pill gemini-checking">Checking…</span>
+              </div>
+              <p id="gemini-availability-desc" class="hint gemini-desc">Detecting on-device model availability…</p>
+              <p id="gemini-flag-hint" class="hint gemini-flag-hint hidden">
+                Enable
+                <a id="gemini-flag-link" href="chrome://flags/#prompt-api-for-gemini-nano" class="flag-link">Prompt API for Gemini Nano</a>
+                in <code>chrome://flags</code>, then restart Chrome. Requires Chrome 127+ with on-device AI support.
+              </p>
+            </div>
+            <label class="field checkbox-field">
+              <input id="use-gemini" type="checkbox">
+              <span>Gemini Nano semantic compaction</span>
+            </label>
+            <p class="hint">Rules copy instantly; Gemini refines in the background when enabled and available on your device.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="tab-refinement" class="tab">
+        <header>
+          <h2>Refinement</h2>
+          <p>Choose how Gemini Nano structures output, or edit prompts directly for full control.</p>
+        </header>
+
+        <div class="card-grid refinement-grid">
+          <article class="card">
+            <h3>Refine profile</h3>
+            <label class="field">
+              <span>Preset structure</span>
+              <select id="refine-preset">
+                <option value="ai-prompt">AI Prompt</option>
+                <option value="research-brief">Research Brief</option>
+                <option value="product-spec">Product Spec</option>
+                <option value="meeting-notes">Meeting Notes</option>
+                <option value="outline-only">Outline Only</option>
+                <option value="bullets-only">Bullets Only</option>
+              </select>
+            </label>
+            <p id="refine-preset-desc" class="hint">Task-oriented prompt with context, source material, and constraints.</p>
+            <pre id="refine-schema-preview" class="schema-preview"></pre>
+          </article>
+
+          <article class="card">
+            <h3>Refinement length</h3>
+            <label class="field">
+              <span>How much detail to preserve</span>
+              <select id="refine-length">
+                <option value="concise">Concise</option>
+                <option value="balanced">Balanced</option>
+                <option value="comprehensive">Comprehensive</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Prompt mode</span>
+              <select id="refine-mode">
+                <option value="preset">Use preset prompts</option>
+                <option value="custom">Custom prompts</option>
+              </select>
+            </label>
+            <p class="hint">Comprehensive keeps more sections for long landing pages. Custom mode uses the editors below.</p>
+          </article>
+
+          <article class="card card-wide">
+            <h3>Prompt editor</h3>
+            <label class="field">
+              <span>System prompt</span>
+              <textarea id="custom-system-prompt" rows="8" spellcheck="false"></textarea>
+            </label>
+            <label class="field">
+              <span>User prompt template <code>{{text}}</code>, <code>{{sourceTitle}}</code>, <code>{{sourceUrl}}</code></span>
+              <textarea id="custom-user-prompt" rows="10" spellcheck="false"></textarea>
+            </label>
+            <div class="refine-actions">
+              <button id="restore-preset-prompts" type="button" class="btn-secondary">Restore preset defaults</button>
+              <span id="prompt-validation" class="save-status"></span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="tab-guide" class="tab">
+        <header>
+          <h2>How to Use</h2>
+          <p>Compact messy webpage copy into clean, paste-ready prompts — entirely on your device.</p>
+        </header>
+
+        <div class="guide-grid">
+          <article class="card guide-card">
+            <h3>Quick start</h3>
+            <ol class="guide-steps">
+              <li>Select text on any webpage (at least your minimum character threshold).</li>
+              <li>Copy with <kbd data-copy-shortcut>Ctrl+C</kbd> when auto-compact is on, or press <kbd data-compact-shortcut>Alt+Shift+C</kbd> to compact without copying first.</li>
+              <li>Paste the cleaned Markdown into Claude, ChatGPT, Gemini, or any AI chat.</li>
+            </ol>
+          </article>
+
+          <article class="card guide-card">
+            <h3>Keyboard shortcuts</h3>
+            <table class="guide-table">
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>Windows / Linux</th>
+                  <th>macOS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Compact selection</td>
+                  <td><kbd data-compact-shortcut>Alt+Shift+C</kbd></td>
+                  <td><kbd data-compact-shortcut>Alt+Shift+C</kbd></td>
+                </tr>
+                <tr>
+                  <td>Auto-compact on copy</td>
+                  <td><kbd data-copy-shortcut>Ctrl+C</kbd></td>
+                  <td><kbd data-copy-shortcut>Ctrl+C</kbd></td>
+                </tr>
+                <tr>
+                  <td>Customize shortcut</td>
+                  <td colspan="2"><a href="chrome://extensions/shortcuts" data-shortcuts-settings class="inline-link">chrome://extensions/shortcuts</a> → SynapseClean</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="hint">Chrome maps <kbd>Alt+Shift+C</kbd> to <kbd>⌥⇧C</kbd> on Mac automatically.</p>
+          </article>
+
+          <article class="card guide-card">
+            <h3>Other ways to compact</h3>
+            <ul class="guide-list">
+              <li><strong>Context menu</strong> — Select text, right-click, choose <em>SynapseClean: Compact for AI</em>.</li>
+              <li><strong>Extension popup</strong> — Toggle protection and auto-compact; open Prompt Console for full policy.</li>
+              <li><strong>Compaction toast</strong> — After processing, a toast shows chars saved; click to copy again if needed.</li>
+            </ul>
+          </article>
+
+          <article class="card guide-card">
+            <h3>Tips</h3>
+            <ul class="guide-list">
+              <li>Raise the minimum character threshold if small selections should copy unchanged.</li>
+              <li>Try Markdown, outline, or bullets output in Compaction Policy.</li>
+              <li>Open Refinement to pick a profile (AI Prompt, Product Spec, etc.) or edit Gemini prompts directly.</li>
+              <li>Enable Gemini Nano for structured refinement when Chrome 127+ and on-device AI are available.</li>
+              <li>Without Gemini, SynapseClean applies a default AI-ready Markdown template.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="tab-audit" class="tab">
+        <header>
+          <h2>Usage Log</h2>
+          <p>Local-only compaction metrics. Nothing leaves your device.</p>
+        </header>
+        <div class="card">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody id="audit-body">
+              <tr><td colspan="2" class="empty">Loading usage log...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tab-support" class="tab">
+        <header>
+          <h2>Support Development</h2>
+          <p>SynapseClean is free and open-source. If it saves you context windows, consider buying me a coffee.</p>
+        </header>
+        <div class="kofi-panel">
+          <a id="kofi-link" class="kofi-btn kofi-btn-lg" href="https://ko-fi.com/D6M821E6GR" target="_blank" rel="noopener noreferrer">
+            <span class="kofi-icon" aria-hidden="true">☕</span>
+            Support me on Ko-fi
+          </a>
+        </div>
+      </section>
+
+      <footer class="action-bar">
+        <button id="save-settings" class="btn-primary">Save Policy</button>
+        <span id="save-status" class="save-status"></span>
+      </footer>
+    </main>
+  </div>
+
+  <script type="module" src="options.ts"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+node_modules
+dist
+.DS_Store
+*.local
+playwright-report/
+test-results/
+*-store.zip
+synapseclean-*.zip
+
+# Bun
+.bun
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Env / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Editor / OS
+.idea
+.vscode
+*.swp
+*.swo
+Thumbs.db
