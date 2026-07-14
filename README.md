@@ -2,8 +2,6 @@
 
 **Local context compactor and semantic prompt cleaner for AI power-users.**
 
-> Part of the [synapseclean-project](../) monorepo (`synapseclean` + `synapseclean-web`). No backend package — 100% client-side.
-
 SynapseClean is an open-source Chrome extension that intercepts messy webpage copy and compacts it into clean, paste-ready prompts before it reaches your clipboard or AI chat. All compaction runs on-device. There are no accounts, no payments, and no telemetry.
 
 <p align="center">
