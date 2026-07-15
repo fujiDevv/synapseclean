@@ -1,6 +1,6 @@
 {
   "name": "synapseclean",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Open-source local context compactor and semantic prompt cleaner for AI power-users.",
   "license": "MIT",
   "repository": {

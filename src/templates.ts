@@ -9,10 +9,18 @@ function firstSubstantiveLine(text: string): string {
   return lines[0]?.slice(0, 160) ?? 'Web content captured for AI context.';
 }
 
-export function buildBoilerplateTemplate(cleanedText: string, meta: RefineMeta = {}): string {
+export function buildBoilerplateTemplate(cleanedText: string, meta: RefineMeta = {}, customTemplate?: string): string {
   const title = meta.sourceTitle?.trim() || 'Captured Web Content';
   const url = meta.sourceUrl?.trim() || 'unknown';
   const summary = firstSubstantiveLine(cleanedText);
+
+  if (customTemplate && customTemplate.trim()) {
+    return customTemplate
+      .replace(/\{\{content\}\}/g, cleanedText.trim())
+      .replace(/\{\{text\}\}/g, cleanedText.trim())
+      .replace(/\{\{sourceTitle\}\}/g, title)
+      .replace(/\{\{sourceUrl\}\}/g, url);
+  }
 
   return `# ${title}
 

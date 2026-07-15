@@ -19,6 +19,7 @@ export const DEFAULT_SETTINGS = {
   customSystemPrompt: REFINE_PROFILES['ai-prompt'].systemPrompt,
   customUserPromptTemplate: REFINE_PROFILES['ai-prompt'].userPromptTemplate,
   compactionMode: 'prepare' as const,
+  domainProfiles: [] as import('./types').DomainProfile[],
 };
 
 /** Public product site (marketing monorepo package: synapseclean-web). */

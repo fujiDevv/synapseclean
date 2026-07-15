@@ -125,14 +125,32 @@ function normalizeMarkdown(raw: string): string {
 }
 
 /** Extract the current selection as Markdown when HTML structure is available. */
-export function getSelectionAsMarkdown(): string {
+export function getSelectionAsMarkdown(excludeSelectors: string[] = []): string {
   const sel = window.getSelection();
   if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return '';
 
   const range = sel.getRangeAt(0);
   const fragment = range.cloneContents();
-  const lines: string[] = [];
+  
+  if (excludeSelectors.length > 0) {
+    const wrapper = document.createElement('div');
+    wrapper.appendChild(fragment);
+    for (const selector of excludeSelectors) {
+      try {
+        const els = wrapper.querySelectorAll(selector);
+        for (const el of els) el.remove();
+      } catch {
+        // ignore invalid selectors
+      }
+    }
+    const lines: string[] = [];
+    for (const child of wrapper.childNodes) walk(child, lines);
+    const md = normalizeMarkdown(lines.join(''));
+    if (md.length >= 40) return md;
+    return sel.toString();
+  }
 
+  const lines: string[] = [];
   for (const child of fragment.childNodes) walk(child, lines);
   const md = normalizeMarkdown(lines.join(''));
 

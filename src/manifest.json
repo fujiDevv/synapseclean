@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SynapseClean",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "The first local context compactor & semantic prompt cleaner. Compress messy web copy into laser-focused AI prompts — 100% on-device.",
   "permissions": [
     "storage",

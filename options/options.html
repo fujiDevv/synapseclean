@@ -20,6 +20,7 @@
       <nav>
         <button class="nav-btn active" data-tab="policy">Compaction Policy</button>
         <button class="nav-btn" data-tab="refinement">Refinement</button>
+        <button class="nav-btn" data-tab="profiles">Site Profiles</button>
         <button class="nav-btn" data-tab="guide">How to Use</button>
         <button class="nav-btn" data-tab="audit">Usage Log</button>
         <button class="nav-btn" data-tab="support">Support</button>
@@ -160,6 +161,22 @@
               <button id="restore-preset-prompts" type="button" class="btn-secondary">Restore preset defaults</button>
               <span id="prompt-validation" class="save-status"></span>
             </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="tab-profiles" class="tab">
+        <header>
+          <h2>Site Profiles</h2>
+          <p>Define custom compaction rules and prompts for specific domains.</p>
+        </header>
+        <div class="card-grid">
+          <article class="card card-wide">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3>Domain Profiles</h3>
+              <button id="add-profile-btn" class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 6px;">Add Profile</button>
+            </div>
+            <div id="profiles-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
           </article>
         </div>
       </section>

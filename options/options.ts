@@ -4,7 +4,7 @@ import { DEFAULT_SETTINGS, GITHUB_REPO_URL, KO_FI_URL, STORAGE_KEYS } from '../s
 import { extensionApi } from '../src/platform';
 import { getRefineProfile, validateUserPromptTemplate } from '../src/refine-profiles';
 import { migrateSettings } from '../src/settings-migrate';
-import type { CompactStats, GeminiAvailability, RefinePreset, SynapseSettings } from '../src/types';
+import type { CompactStats, DomainProfile, GeminiAvailability, RefinePreset, SynapseSettings } from '../src/types';
 
 const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.nav-btn[data-tab]'));
 const tabSections = Array.from(document.querySelectorAll<HTMLElement>('.tab'));
@@ -29,6 +29,82 @@ const customSystemPrompt = document.getElementById('custom-system-prompt') as HT
 const customUserPrompt = document.getElementById('custom-user-prompt') as HTMLTextAreaElement;
 const restorePresetPrompts = document.getElementById('restore-preset-prompts') as HTMLButtonElement;
 const promptValidation = document.getElementById('prompt-validation') as HTMLSpanElement;
+
+const profilesList = document.getElementById('profiles-list') as HTMLDivElement;
+const addProfileBtn = document.getElementById('add-profile-btn') as HTMLButtonElement;
+let domainProfiles: DomainProfile[] = [];
+
+function renderProfiles() {
+  profilesList.innerHTML = '';
+  if (domainProfiles.length === 0) {
+    profilesList.innerHTML = '<p class="hint">No domain profiles created.</p>';
+    return;
+  }
+  domainProfiles.forEach((p, index) => {
+    const el = document.createElement('div');
+    el.className = 'profile-card';
+    el.style.border = '1px solid var(--color-line)';
+    el.style.padding = '1rem';
+    el.style.borderRadius = '8px';
+    el.style.display = 'flex';
+    el.style.flexDirection = 'column';
+    el.style.gap = '0.75rem';
+    el.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <input type="text" class="profile-url" value="${p.urlPattern}" placeholder="*://*.example.com/*" style="width: 60%; padding: 0.4rem; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 4px; color: var(--color-ink);">
+        <button type="button" class="btn-secondary remove-profile-btn" data-index="${index}" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Remove</button>
+      </div>
+      <div>
+        <label class="field" style="margin-top: 0;">
+          <span style="font-size: 0.8rem; margin-bottom: 0.25rem;">Exclude CSS Selectors (comma separated)</span>
+          <input type="text" class="profile-exclude" value="${p.excludeSelectors.join(', ')}" placeholder=".sidebar, .footer, #ads">
+        </label>
+      </div>
+      <div>
+        <label class="field" style="margin-top: 0;">
+          <span style="font-size: 0.8rem; margin-bottom: 0.25rem;">Prompt Template (use {{content}})</span>
+          <textarea class="profile-prompt" rows="3" placeholder="Summarize: \n\n{{content}}" style="padding: 0.5rem; border-radius: 4px; border: 1px solid var(--color-line); background: var(--color-surface); color: var(--color-ink);">${p.promptTemplate}</textarea>
+        </label>
+      </div>
+    `;
+    profilesList.appendChild(el);
+  });
+
+  document.querySelectorAll('.remove-profile-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = Number((e.target as HTMLButtonElement).dataset.index);
+      domainProfiles.splice(idx, 1);
+      renderProfiles();
+    });
+  });
+  
+  document.querySelectorAll('.profile-card').forEach((card, index) => {
+    const urlInput = card.querySelector('.profile-url') as HTMLInputElement;
+    const excludeInput = card.querySelector('.profile-exclude') as HTMLInputElement;
+    const promptInput = card.querySelector('.profile-prompt') as HTMLTextAreaElement;
+    
+    const updateState = () => {
+      domainProfiles[index].urlPattern = urlInput.value;
+      domainProfiles[index].excludeSelectors = excludeInput.value.split(',').map(s => s.trim()).filter(Boolean);
+      domainProfiles[index].promptTemplate = promptInput.value;
+    };
+    
+    urlInput.addEventListener('input', updateState);
+    excludeInput.addEventListener('input', updateState);
+    promptInput.addEventListener('input', updateState);
+  });
+}
+
+addProfileBtn.addEventListener('click', () => {
+  domainProfiles.push({
+    id: crypto.randomUUID(),
+    urlPattern: '*github.com*',
+    excludeSelectors: ['.file-navigation', '.Layout-sidebar'],
+    promptTemplate: 'Analyze this code:\\n\\n{{content}}',
+    enabled: true
+  });
+  renderProfiles();
+});
 
 function applyGeminiAvailabilityUi(
   availability: GeminiAvailability,
@@ -96,6 +172,7 @@ function readForm(): SynapseSettings {
     customSystemPrompt: customSystemPrompt.value,
     customUserPromptTemplate: customUserPrompt.value,
     compactionMode: DEFAULT_SETTINGS.compactionMode,
+    domainProfiles: domainProfiles,
   };
 }
 
@@ -112,6 +189,8 @@ function applyForm(settings: SynapseSettings): void {
   customSystemPrompt.value = settings.customSystemPrompt;
   customUserPrompt.value = settings.customUserPromptTemplate;
   updatePresetPreview(settings.refinePreset);
+  domainProfiles = settings.domainProfiles || [];
+  renderProfiles();
 }
 
 function switchToTab(tabName: string): void {

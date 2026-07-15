@@ -10,6 +10,14 @@ export type RefineLength = 'concise' | 'balanced' | 'comprehensive';
 export type RefineMode = 'preset' | 'custom';
 export type CompactionMode = 'prepare' | 'legacy';
 
+export interface DomainProfile {
+  id: string;
+  urlPattern: string;
+  excludeSelectors: string[];
+  promptTemplate: string;
+  enabled: boolean;
+}
+
 export interface SynapseSettings {
   enabled: boolean;
   autoCompactOnCopy: boolean;
@@ -23,6 +31,7 @@ export interface SynapseSettings {
   customSystemPrompt: string;
   customUserPromptTemplate: string;
   compactionMode: CompactionMode;
+  domainProfiles: DomainProfile[];
 }
 
 export interface RefineMeta {

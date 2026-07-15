@@ -17,7 +17,7 @@ import { extensionApi, getRuntimeUrl } from './src/platform';
 import { migrateSettings } from './src/settings-migrate';
 import { buildBoilerplateTemplate } from './src/templates';
 import { shouldAcceptGeminiUpgrade } from './src/upgrade-quality';
-import type { CompactResult, GeminiAvailability, RefineMeta, SynapseSettings } from './src/types';
+import type { CompactResult, DomainProfile, GeminiAvailability, RefineMeta, SynapseSettings } from './src/types';
 
 let settings: SynapseSettings = { ...DEFAULT_SETTINGS };
 let bridgeReady = false;
@@ -93,12 +93,27 @@ async function loadSettings(): Promise<void> {
   }
 }
 
-function getSelectionText(fallback?: string): string {
+function getMatchingProfile(url: string): DomainProfile | null {
+  if (!settings.domainProfiles) return null;
+  for (const profile of settings.domainProfiles) {
+    if (!profile.enabled) continue;
+    try {
+      const regexStr = profile.urlPattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+      const regex = new RegExp('^' + regexStr + '$', 'i');
+      if (regex.test(url)) return profile;
+    } catch {
+      if (url.includes(profile.urlPattern)) return profile;
+    }
+  }
+  return null;
+}
+
+function getSelectionText(fallback?: string, excludeSelectors: string[] = []): string {
   if (fallback?.trim()) return fallback.trim();
   const sel = window.getSelection();
   const rawText = sel?.toString() ?? '';
   if (rawText.length > 100000) return rawText.trim();
-  const md = getSelectionAsMarkdown();
+  const md = getSelectionAsMarkdown(excludeSelectors);
   if (md.trim().length > 0) return md.trim();
   return rawText.trim();
 }
@@ -213,7 +228,11 @@ async function handleCompactRequest(text?: string): Promise<void> {
   compacting = true;
 
   try {
-    const selection = getSelectionText(text);
+    const meta = getRefineMeta();
+    const profile = getMatchingProfile(meta.sourceUrl ?? '');
+    const excludeSelectors = profile ? profile.excludeSelectors : [];
+    
+    const selection = getSelectionText(text, excludeSelectors);
     if (selection.length < settings.minCharsToCompact) {
       showErrorToast(`Select at least ${settings.minCharsToCompact} characters to compact.`);
       return;
@@ -226,7 +245,7 @@ async function handleCompactRequest(text?: string): Promise<void> {
     const start = performance.now();
     const original = selection;
     const prepared = await prepareSelectionAsync(original);
-    const output = buildTemplateOutput(prepared);
+    const output = buildBoilerplateTemplate(prepared, meta, profile?.promptTemplate);
     const willUpgrade = settings.useGeminiNano;
     const fastResult = buildResult(original, output, willUpgrade ? 'rules' : 'template', start, {
       usedTemplate: true,
@@ -257,7 +276,10 @@ async function handleCompactRequest(text?: string): Promise<void> {
 document.addEventListener('copy', (event) => {
   if (!settings.enabled || !settings.autoCompactOnCopy || compacting || geminiUpgradeInFlight) return;
 
-  const selection = getSelectionText();
+  const meta = getRefineMeta();
+  const profile = getMatchingProfile(meta.sourceUrl ?? '');
+  const excludeSelectors = profile ? profile.excludeSelectors : [];
+  const selection = getSelectionText(undefined, excludeSelectors);
   if (selection.length < settings.minCharsToCompact) return;
   if (!event.clipboardData) return;
 
@@ -271,7 +293,7 @@ document.addEventListener('copy', (event) => {
     const start = performance.now();
     const original = selection;
     const prepared = prepareSelection(original);
-    const output = buildTemplateOutput(prepared);
+    const output = buildBoilerplateTemplate(prepared, meta, profile?.promptTemplate);
     const willUpgrade = settings.useGeminiNano;
     const fastResult = buildResult(original, output, willUpgrade ? 'rules' : 'template', start, {
       usedTemplate: true,
